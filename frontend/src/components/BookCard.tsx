@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+
 interface BookCardProps {
   id: number
   title: string
@@ -5,14 +7,15 @@ interface BookCardProps {
   cover?: string
   description?: string
   category?: string
-  onClick?: () => void
 }
 
-const BookCard = ({ title, author, cover, description, category, onClick }: BookCardProps) => {
+const BookCard = ({ id, title, author, cover, description, category }: BookCardProps) => {
+  const navigate = useNavigate()
+
   return (
     <div 
       className="cursor-pointer bg-white rounded-xl overflow-hidden shadow-sm mb-3"
-      onClick={onClick}
+      onClick={() => navigate(`/book/${id}`)}
     >
       {/* 封面 */}
       <div className="w-full aspect-[3/4] bg-gray-200 overflow-hidden">

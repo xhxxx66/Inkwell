@@ -1,5 +1,5 @@
 import SearchBar from '@/components/SearchBar'
-import SlideShow from '@/components/Banner'
+import SlideShow from '@/components/SlideShow'
 import CategoryTabs from '@/components/CategoryTabs'
 import BookList from '@/components/BookList'
 

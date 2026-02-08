@@ -1,29 +1,40 @@
-import { lazy, Suspense } from 'react'
-import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Loading from '@/components/Loading'
 import MainLayout from '@/layouts/MainLayout'
 
-// 懒加载页面组件
+// 主布局页面
 const Home = lazy(() => import('@/pages/Home'))
 const Bookshelf = lazy(() => import('@/pages/Bookshelf'))
 const Ai = lazy(() => import('@/pages/Ai'))
 const Profile = lazy(() => import('@/pages/Profile'))
 
-// 加载中组件
-const Loading = () => (
-  <div className="flex items-center justify-center h-screen">
-    <span className="text-gray-500">加载中...</span>
-  </div>
-)
+// Book 模块
+const BookDetail = lazy(() => import('@/pages/Book'))
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<MainLayout />}>
-      <Route index element={<Suspense fallback={<Loading />}><Home /></Suspense>} />
-      <Route path="bookshelf" element={<Suspense fallback={<Loading />}><Bookshelf /></Suspense>} />
-      <Route path="ai" element={<Suspense fallback={<Loading />}><Ai /></Suspense>} />
-      <Route path="profile" element={<Suspense fallback={<Loading />}><Profile /></Suspense>} />
-    </Route>
+// 其他页面
+const Search = lazy(() => import('@/pages/Search'))
+
+export default function RouterConfig() {
+  return (
+    <Router>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          {/* 独立页面 */}
+          <Route path="/search" element={<Search />} />
+
+          {/* Book 模块 */}
+          <Route path="/book/:id" element={<BookDetail />} />
+
+          {/* 主布局（带底部导航） */}
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Home />} />
+            <Route path="bookshelf" element={<Bookshelf />} />
+            <Route path="ai" element={<Ai />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </Router>
   )
-)
-
-export default router
+}
