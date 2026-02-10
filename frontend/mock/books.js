@@ -30,6 +30,7 @@ export default [
   {
     url: '/api/books',
     method: 'get',
+    timeout: 500, // 模拟网络延迟 500ms
     response: ({ query }) => {
       const { page = '1', limit = '10', category } = query
       const currentPage = parseInt(page, 10)

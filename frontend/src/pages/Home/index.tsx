@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import SearchBar from '@/components/SearchBar'
 import SlideShow from '@/components/SlideShow'
 import CategoryTabs from '@/components/CategoryTabs'
@@ -11,6 +12,14 @@ const bannerSlides = [
 ]
 
 const Home = () => {
+  // 测试 KeepAlive 是否生效
+  useEffect(() => {
+    console.log('🏠 Home 组件挂载')
+    return () => {
+      console.log('🏠 Home 组件卸载')
+    }
+  }, [])
+
   const handleCategoryChange = (categoryId: number) => {
     // TODO: 根据分类加载对应书籍
     console.log('切换分类:', categoryId)
