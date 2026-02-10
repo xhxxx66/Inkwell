@@ -1,0 +1,212 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== 用户 ====================
+model User {
+  id          Int       @id @default(autoincrement())
+  username    String    @unique @db.VarChar(50)
+  password    String    @db.VarChar(255)
+  nickname    String?   @db.VarChar(50)
+  avatar      String?   @db.VarChar(500)
+  email       String?   @db.VarChar(100)
+  phone       String?   @db.VarChar(20)
+  gender      String    @default("保密") @db.VarChar(10)
+  bio         String?   @db.VarChar(500)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // 关联
+  books           Book[]
+  comments        Comment[]
+  likes           UserLikeBook[]
+  bookmarks       Bookmark[]
+  readingRecords  ReadingRecord[]
+
+  @@map("users")
+}
+
+// ==================== 书籍 ====================
+model Book {
+  id            Int       @id @default(autoincrement())
+  title         String    @db.VarChar(100)
+  author        String    @db.VarChar(50)
+  cover         String?   @db.VarChar(500)
+  description   String?   @db.Text
+  wordCount     Int       @default(0) @map("word_count")
+  chapterCount  Int       @default(0) @map("chapter_count")
+  status        String    @default("连载中") @db.VarChar(10)
+  rating        Decimal   @default(0) @db.Decimal(2, 1)
+  readCount     Int       @default(0) @map("read_count")
+  likeCount     Int       @default(0) @map("like_count")
+  collectCount  Int       @default(0) @map("collect_count")
+  commentCount  Int       @default(0) @map("comment_count")
+  publishedAt   DateTime? @map("published_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // 外键
+  authorId      Int?      @map("author_id")
+  categoryId    Int?      @map("category_id")
+
+  // 关联
+  authorUser    User?           @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  category      Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  chapters      Chapter[]
+  tags          BookTag[]
+  comments      Comment[]
+  likes         UserLikeBook[]
+  bookmarks     Bookmark[]
+  readingRecords ReadingRecord[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("books")
+}
+
+// ==================== 章节 ====================
+model Chapter {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(100)
+  content     String    @db.Text
+  wordCount   Int       @default(0) @map("word_count")
+  orderNum    Int       @map("order_num")
+  isVip       Boolean   @default(false) @map("is_vip")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // 外键
+  bookId      Int       @map("book_id")
+
+  // 关联
+  book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  readingRecords ReadingRecord[]
+
+  @@index([bookId])
+  @@unique([bookId, orderNum])
+  @@map("chapters")
+}
+
+// ==================== 分类 ====================
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(50)
+  icon      String?   @db.VarChar(100)
+  orderNum  Int       @default(0) @map("order_num")
+
+  // 关联
+  books     Book[]
+
+  @@map("categories")
+}
+
+// ==================== 标签 ====================
+model Tag {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(50)
+
+  // 关联
+  books     BookTag[]
+
+  @@map("tags")
+}
+
+// ==================== 书籍-标签关联 ====================
+model BookTag {
+  bookId    Int       @map("book_id")
+  tagId     Int       @map("tag_id")
+
+  book      Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  tag       Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([bookId, tagId])
+  @@index([tagId])
+  @@map("book_tags")
+}
+
+// ==================== 评论 ====================
+model Comment {
+  id          Int       @id @default(autoincrement())
+  content     String    @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // 外键
+  bookId      Int       @map("book_id")
+  userId      Int       @map("user_id")
+  parentId    Int?      @map("parent_id")
+
+  // 关联
+  book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent      Comment?  @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[] @relation("CommentToComment")
+
+  @@index([bookId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+// ==================== 用户点赞书籍 ====================
+model UserLikeBook {
+  userId      Int       @map("user_id")
+  bookId      Int       @map("book_id")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([userId, bookId])
+  @@index([bookId])
+  @@map("user_like_books")
+}
+
+// ==================== 书架/收藏 ====================
+model Bookmark {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // 外键
+  userId      Int       @map("user_id")
+  bookId      Int       @map("book_id")
+
+  // 关联
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
+  @@map("bookmarks")
+}
+
+// ==================== 阅读记录 ====================
+model ReadingRecord {
+  id          Int       @id @default(autoincrement())
+  progress    Int       @default(0)
+  lastReadAt  DateTime  @default(now()) @map("last_read_at") @db.Timestamptz(6)
+
+  // 外键
+  userId      Int       @map("user_id")
+  bookId      Int       @map("book_id")
+  chapterId   Int       @map("chapter_id")
+
+  // 关联
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter     Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
+  @@map("reading_records")
+}
