@@ -1,11 +1,14 @@
 import { create } from 'zustand'
 import type { Book } from '@/types'
+import { fetchBooks } from '@/api/books'
 
 const PAGE_SIZE = 10
 
 interface HomeState {
   // 书籍列表数据
   books: Book[]
+  // 当前分类
+  category: string
   // 分页相关
   page: number
   hasMore: boolean
@@ -17,11 +20,13 @@ interface HomeState {
   // 操作方法
   loadBooks: () => Promise<void>
   loadMore: () => Promise<void>
+  setCategory: (category: string) => void
   reset: () => void
 }
 
 export const useHomeStore = create<HomeState>((set, get) => ({
   books: [],
+  category: '全部',
   page: 1,
   hasMore: true,
   loading: false,
@@ -30,7 +35,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
 
   // 首次加载书籍
   loadBooks: async () => {
-    const { initialized, loading } = get()
+    const { initialized, loading, category } = get()
     
     // 如果已经初始化过且有数据，不重复加载
     if (initialized && get().books.length > 0) return
@@ -40,8 +45,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     set({ loading: true })
 
     try {
-      const res = await fetch(`/api/books?page=1&limit=${PAGE_SIZE}`)
-      const data = await res.json()
+      const data: any = await fetchBooks(1, PAGE_SIZE, category)
 
       if (data.code === 200) {
         const newBooks = data.items || []
@@ -63,7 +67,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
 
   // 加载更多
   loadMore: async () => {
-    const { loadingMore, hasMore, page, books } = get()
+    const { loadingMore, hasMore, page, books, category } = get()
 
     // 避免重复请求
     if (loadingMore) return
@@ -74,8 +78,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
 
     try {
       const nextPage = page + 1
-      const res = await fetch(`/api/books?page=${nextPage}&limit=${PAGE_SIZE}`)
-      const data = await res.json()
+      const data: any = await fetchBooks(nextPage, PAGE_SIZE, category)
 
       if (data.code === 200) {
         const newBooks = data.items || []
@@ -95,10 +98,46 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     }
   },
 
+  // 切换分类
+  setCategory: async (category: string) => {
+    const { loading } = get()
+    if (loading) return
+
+    set({ 
+      category,
+      books: [],
+      page: 1,
+      hasMore: true,
+      initialized: false,
+      loading: true
+    })
+
+    try {
+      const data: any = await fetchBooks(1, PAGE_SIZE, category)
+
+      if (data.code === 200) {
+        const newBooks = data.items || []
+        const total = data.pagination?.total || 0
+
+        set({
+          books: newBooks,
+          page: 1,
+          hasMore: newBooks.length < total,
+          initialized: true
+        })
+      }
+    } catch (error) {
+      console.error('获取书籍列表失败:', error)
+    } finally {
+      set({ loading: false })
+    }
+  },
+
   // 重置状态（如需刷新数据时使用）
   reset: () => {
     set({
       books: [],
+      category: '全部',
       page: 1,
       hasMore: true,
       loading: false,

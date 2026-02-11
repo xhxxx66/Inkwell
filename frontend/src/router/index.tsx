@@ -12,6 +12,7 @@ const Profile = lazy(() => import('@/pages/Profile'))
 
 // Book 模块
 const BookDetail = lazy(() => import('@/pages/Book'))
+const Reader = lazy(() => import('@/pages/Reader'))
 
 // 其他页面
 const Search = lazy(() => import('@/pages/Search'))
@@ -27,6 +28,7 @@ export default function RouterConfig() {
 
             {/* Book 模块 */}
             <Route path="/book/:id" element={<BookDetail />} />
+            <Route path="/reader/:id" element={<Reader />} />
 
             {/* 主布局（带底部导航） */}
             <Route path="/" element={<MainLayout />}>
