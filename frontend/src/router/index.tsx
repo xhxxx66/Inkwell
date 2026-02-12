@@ -17,12 +17,20 @@ const Reader = lazy(() => import('@/pages/Reader'))
 // 其他页面
 const Search = lazy(() => import('@/pages/Search'))
 
+// 认证页面
+const Login = lazy(() => import('@/pages/Login'))
+const Register = lazy(() => import('@/pages/Register'))
+
 export default function RouterConfig() {
   return (
     <Router>
       <AliveScope>
         <Suspense fallback={<Loading />}>
           <Routes>
+            {/* 认证页面 */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
             {/* 独立页面 */}
             <Route path="/search" element={<Search />} />
 

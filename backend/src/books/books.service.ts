@@ -73,6 +73,51 @@ export class BooksService {
     };
   }
 
+  /**
+   * 搜索书籍（按标题或作者）
+   */
+  async search(keyword: string, limit: number = 10) {
+    if (!keyword || !keyword.trim()) {
+      return {
+        code: 200,
+        msg: 'success',
+        data: []
+      };
+    }
+
+    const books = await this.prisma.book.findMany({
+      where: {
+        OR: [
+          { title: { contains: keyword, mode: 'insensitive' } },
+          { author: { contains: keyword, mode: 'insensitive' } }
+        ]
+      },
+      take: limit,
+      orderBy: { readCount: 'desc' },
+      include: {
+        category: {
+          select: { name: true }
+        }
+      }
+    });
+
+    const items = books.map(book => ({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      cover: book.cover,
+      category: book.category?.name || '',
+      wordCount: book.wordCount,
+      status: book.status
+    }));
+
+    return {
+      code: 200,
+      msg: 'success',
+      data: items
+    };
+  }
+
   async findOne(id: number) {
     const book = await this.prisma.book.findUnique({
       where: { id },

@@ -17,6 +17,12 @@ export class BooksController {
     return this.booksService.findAll(query);
   }
 
+  @Get('search')
+  async searchBooks(@Query('keyword') keyword: string) {
+    const decoded = decodeURIComponent(keyword || '');
+    return this.booksService.search(decoded);
+  }
+
   @Get(':id')
   async getBook(@Param('id', ParseIntPipe) id: number) {
     return this.booksService.findOne(id);
