@@ -1,8 +1,7 @@
 import { 
     useEffect, 
-    useRef,
-    useCallback
- } from 'react';
+    useRef
+} from 'react';
 
 // load more 通用组件
 interface InfiniteScrollProps{
@@ -22,25 +21,20 @@ const  InfiniteScroll:React.FC<InfiniteScrollProps>=({
     endText = '已经到底啦 ~'
 }) => {
     const sentinelRef = useRef<HTMLDivElement>(null);
-    // 使用 ref 保存最新的 onLoadMore，避免 useEffect 依赖变化导致重复触发
-    const onLoadMoreRef = useRef(onLoadMore);
-    onLoadMoreRef.current = onLoadMore;
-
-    const handleIntersect = useCallback(() => {
-        onLoadMoreRef.current();
-    }, []);
+    // 使用 ref 保存最新的状态，避免 useEffect 依赖变化导致重复触发
+    const stateRef = useRef({ hasMore, isLoading, onLoadMore });
+    stateRef.current = { hasMore, isLoading, onLoadMore };
 
     useEffect(()=>{
-        //监听dom元素，只有挂载之后才能拿到
-        if(!hasMore||isLoading) return; //没有数据了，还在加载中
-        
         const sentinel = sentinelRef.current;
         if(!sentinel) return;
 
         //浏览器内部提供的观察者模式，不需要考虑性能问题
         const observer = new IntersectionObserver((entries)=>{
-            if(entries[0].isIntersecting){ // 是否进入视窗 viewport
-                handleIntersect();
+            const { hasMore, isLoading, onLoadMore } = stateRef.current;
+            // 只在进入视口、有更多数据、且未在加载中时触发
+            if(entries[0].isIntersecting && hasMore && !isLoading){ 
+                onLoadMore();
             }
         },{
             threshold: 0, // 元素进入视窗的比例，只有达到比例才触发回调函数
@@ -51,24 +45,25 @@ const  InfiniteScroll:React.FC<InfiniteScrollProps>=({
         
         //卸载(路由切换) 
         return () => {
-            observer.unobserve(sentinel);
+            observer.disconnect();
         }
-    },[hasMore, isLoading, handleIntersect])
+    }, []) // 只在挂载时创建一次 observer
     // react 不建议直接访问dom
     return(
         <div>
             {children}
-            {/* 底部状态区域 - 加大padding确保不被TabBar遮挡 */}
-            <div style={{ padding: '20px 0 80px 0' }}>
-                {/* IntersectionObserver Observer 哨兵元素 */}
-                <div ref={sentinelRef} style={{ height: '4px' }}/>
+            {/* 底部状态区域 - 固定高度避免抖动 */}
+            <div style={{ padding: '20px 0 80px 0', minHeight: '60px' }}>
+                {/* IntersectionObserver 哨兵元素 - 放在状态提示之前 */}
+                <div ref={sentinelRef} style={{ height: '1px', marginBottom: '10px' }}/>
                 {/* 加载中提示 */}
                 {isLoading && (
                     <div style={{ 
                         textAlign: 'center', 
                         color: '#f97316', 
                         fontSize: '14px',
-                        padding: '10px'
+                        height: '40px',
+                        lineHeight: '40px'
                     }}>
                         ⏳ {loadingText}
                     </div>
@@ -79,7 +74,8 @@ const  InfiniteScroll:React.FC<InfiniteScrollProps>=({
                         textAlign: 'center', 
                         color: '#9ca3af', 
                         fontSize: '14px',
-                        padding: '10px'
+                        height: '40px',
+                        lineHeight: '40px'
                     }}>
                         {endText}
                     </div>

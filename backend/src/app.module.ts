@@ -8,6 +8,8 @@ import { CategoriesModule } from './categories/categories.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { ReadingRecordsModule } from './reading-records/reading-records.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { UsersModule } from './users/users.module';
     ChaptersModule,
     AuthModule,
     UsersModule,
+    BookmarksModule,
+    ReadingRecordsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { BookOpen, Heart, MessageCircle, Star, ChevronRight, Lock } from 'lucide-react'
+import { BookOpen, Heart, MessageCircle, Star, ChevronRight, Lock, Check, Loader2 } from 'lucide-react'
 import Header from '@/components/Header'
 import Loading from '@/components/Loading'
 import { fetchBookById, fetchChaptersByBookId } from '@/api/books'
+import { checkBookmark, toggleBookmark } from '@/api/bookmarks'
+import { useUserStore } from '@/store/user'
+import { useBookshelfStore } from '@/store/bookshelf'
 import type { Book } from '@/types'
 
 interface Chapter {
@@ -17,10 +20,17 @@ interface Chapter {
 const BookDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { isLogin } = useUserStore()
+  const { reset: resetBookshelf } = useBookshelfStore()
+  
   const [book, setBook] = useState<Book | null>(null)
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
   const [chaptersLoading, setChaptersLoading] = useState(false)
+  
+  // 书架状态
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [bookmarkLoading, setBookmarkLoading] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -44,7 +54,18 @@ const BookDetail = () => {
         }
       })
       .finally(() => setChaptersLoading(false))
-  }, [id])
+    
+    // 检查是否已加入书架（仅登录用户）
+    if (isLogin) {
+      checkBookmark(bookId)
+        .then((data: any) => {
+          if (data.code === 200) {
+            setIsBookmarked(data.data?.isBookmarked || false)
+          }
+        })
+        .catch(() => {})
+    }
+  }, [id, isLogin])
 
   const handleReadChapter = (chapterId: number) => {
     navigate(`/reader/${chapterId}`, { replace: true })
@@ -53,6 +74,30 @@ const BookDetail = () => {
   const handleStartReading = () => {
     if (chapters.length > 0) {
       navigate(`/reader/${chapters[0].id}`, { replace: true })
+    }
+  }
+
+  // 处理加入/移出书架
+  const handleToggleBookmark = async () => {
+    if (!isLogin) {
+      navigate('/login')
+      return
+    }
+
+    if (bookmarkLoading) return
+
+    setBookmarkLoading(true)
+    try {
+      const data: any = await toggleBookmark(Number(id))
+      if (data.code === 200) {
+        setIsBookmarked(data.data?.isBookmarked || false)
+        // 标记书架需要刷新
+        resetBookshelf()
+      }
+    } catch (error) {
+      console.error('操作失败:', error)
+    } finally {
+      setBookmarkLoading(false)
     }
   }
 
@@ -202,8 +247,25 @@ const BookDetail = () => {
 
       {/* 底部操作栏 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 flex gap-3">
-        <button className="flex-1 py-2.5 border border-primary text-primary rounded-lg font-medium">
-          加入书架
+        <button 
+          onClick={handleToggleBookmark}
+          disabled={bookmarkLoading}
+          className={`flex-1 py-2.5 rounded-lg font-medium flex items-center justify-center gap-1.5 transition-colors ${
+            isBookmarked 
+              ? 'bg-primary/10 text-primary border border-primary/30' 
+              : 'border border-primary text-primary'
+          } disabled:opacity-50`}
+        >
+          {bookmarkLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : isBookmarked ? (
+            <>
+              <Check className="w-4 h-4" />
+              已在书架
+            </>
+          ) : (
+            '加入书架'
+          )}
         </button>
         <button 
           onClick={handleStartReading}

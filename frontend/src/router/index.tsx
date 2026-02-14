@@ -16,6 +16,7 @@ const Reader = lazy(() => import('@/pages/Reader'))
 
 // 其他页面
 const Search = lazy(() => import('@/pages/Search'))
+const ReadingHistory = lazy(() => import('@/pages/ReadingHistory'))
 
 // 认证页面
 const Login = lazy(() => import('@/pages/Login'))
@@ -33,6 +34,7 @@ export default function RouterConfig() {
 
             {/* 独立页面 */}
             <Route path="/search" element={<Search />} />
+            <Route path="/reading-history" element={<ReadingHistory />} />
 
             {/* Book 模块 */}
             <Route path="/book/:id" element={<BookDetail />} />

@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, List, Settings } from 'lucide-react'
 import Loading from '@/components/Loading'
 import { fetchChapterById } from '@/api/books'
+import { upsertReadingRecord } from '@/api/reading-records'
+import { useUserStore } from '@/store/user'
 
 interface ChapterData {
   id: number
@@ -22,21 +24,113 @@ interface ChapterData {
 const Reader = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { isLogin } = useUserStore()
   const [chapter, setChapter] = useState<ChapterData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showToolbar, setShowToolbar] = useState(true)
+  
+  // 用于记录阅读进度
+  const contentRef = useRef<HTMLDivElement>(null)
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const lastSavedProgressRef = useRef<number>(0)
 
+  // 计算阅读进度（基于滚动位置）
+  const calculateProgress = useCallback(() => {
+    if (!contentRef.current) return 0
+    const scrollTop = window.scrollY
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    if (docHeight <= 0) return 100
+    const progress = Math.min(100, Math.round((scrollTop / docHeight) * 100))
+    return progress
+  }, [])
+
+  // 保存阅读进度
+  const saveProgress = useCallback(async (progress: number) => {
+    if (!isLogin || !chapter) return
+    // 避免频繁保存相同进度
+    if (Math.abs(progress - lastSavedProgressRef.current) < 5 && progress !== 100) return
+    
+    try {
+      await upsertReadingRecord(chapter.book.id, chapter.id, progress)
+      lastSavedProgressRef.current = progress
+    } catch (error) {
+      console.error('保存阅读进度失败:', error)
+    }
+  }, [isLogin, chapter])
+
+  // 防抖保存
+  const debouncedSaveProgress = useCallback((progress: number) => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current)
+    }
+    saveTimerRef.current = setTimeout(() => {
+      saveProgress(progress)
+    }, 1000) // 1秒后保存
+  }, [saveProgress])
+
+  // 监听滚动事件
+  useEffect(() => {
+    if (!chapter || !isLogin) return
+
+    const handleScroll = () => {
+      const progress = calculateProgress()
+      debouncedSaveProgress(progress)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current)
+      }
+    }
+  }, [chapter, isLogin, calculateProgress, debouncedSaveProgress])
+
+  // 页面离开时保存进度
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isLogin && chapter) {
+        const progress = calculateProgress()
+        // 使用 sendBeacon 确保离开时能发送
+        const data = JSON.stringify({
+          bookId: chapter.book.id,
+          chapterId: chapter.id,
+          progress,
+        })
+        navigator.sendBeacon('/api/reading-records', data)
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      // 组件卸载时保存当前进度
+      if (isLogin && chapter) {
+        const progress = calculateProgress()
+        saveProgress(progress)
+      }
+    }
+  }, [isLogin, chapter, calculateProgress, saveProgress])
+
+  // 章节加载时记录阅读开始
   useEffect(() => {
     if (!id) return
     setLoading(true)
+    lastSavedProgressRef.current = 0
+    
     fetchChapterById(Number(id))
       .then((data: any) => {
         if (data.code === 200) {
           setChapter(data.data)
+          // 章节加载成功后，记录阅读进度为0（表示开始阅读）
+          if (isLogin && data.data) {
+            upsertReadingRecord(data.data.book.id, data.data.id, 0).catch(() => {})
+          }
         }
       })
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, isLogin])
 
   // 返回书籍详情页（用 replace 避免历史记录累积）
   const handleBack = () => {
@@ -105,6 +199,7 @@ const Reader = () => {
 
       {/* 内容区域 */}
       <div 
+        ref={contentRef}
         className="px-5 py-16 min-h-screen"
         onClick={toggleToolbar}
       >
