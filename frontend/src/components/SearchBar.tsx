@@ -9,7 +9,7 @@ const SearchBar = () => {
   }
 
   return (
-    <div className="px-4 pt-3 pb-2 bg-white">
+    <div className="px-4 pt-3 pb-2 bg-white sticky top-0 z-10">
       <div 
         className="flex items-center bg-gray-100 rounded-full px-4 h-11 cursor-pointer"
         onClick={handleClick}

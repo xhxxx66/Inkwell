@@ -46,8 +46,8 @@ const updateTokens = (accessToken: string, refreshToken: string) => {
       parsed.state.refreshToken = refreshToken;
       localStorage.setItem('inkwell-user-store', JSON.stringify(parsed));
     }
-  } catch (e) {
-    console.error('更新 token 失败:', e);
+  } catch {
+    // 静默处理 localStorage 更新失败
   }
 };
 
@@ -63,8 +63,8 @@ const clearAuth = () => {
       parsed.state.isLogin = false;
       localStorage.setItem('inkwell-user-store', JSON.stringify(parsed));
     }
-  } catch (e) {
-    console.error('清除登录状态失败:', e);
+  } catch {
+    // 静默处理 localStorage 清除失败
   }
 };
 

@@ -66,8 +66,8 @@ export const useBookshelfStore = create<BookshelfState>((set, get) => ({
           get().loadReadingRecords(bookIds);
         }
       }
-    } catch (error) {
-      console.error('获取书架失败:', error);
+    } catch {
+      // 静默处理
     } finally {
       set({ loading: false });
     }
@@ -82,8 +82,8 @@ export const useBookshelfStore = create<BookshelfState>((set, get) => ({
       if (data.code === 200) {
         set({ readingRecords: data.data || {} });
       }
-    } catch (error) {
-      console.error('获取阅读记录失败:', error);
+    } catch {
+      // 静默处理
     }
   },
 
@@ -110,8 +110,7 @@ export const useBookshelfStore = create<BookshelfState>((set, get) => ({
         return true;
       }
       return false;
-    } catch (error) {
-      console.error('移出书架失败:', error);
+    } catch {
       return false;
     } finally {
       const updated = new Set(get().operatingBookIds);
@@ -153,8 +152,7 @@ export const useBookshelfStore = create<BookshelfState>((set, get) => ({
         return { isBookmarked };
       }
       return null;
-    } catch (error) {
-      console.error('操作失败:', error);
+    } catch {
       return null;
     } finally {
       const updated = new Set(get().operatingBookIds);

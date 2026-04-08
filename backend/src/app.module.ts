@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { ReadingRecordsModule } from './reading-records/reading-records.module';
+import { SearchModule } from './search/search.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { ReadingRecordsModule } from './reading-records/reading-records.module';
     UsersModule,
     BookmarksModule,
     ReadingRecordsModule,
+    SearchModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

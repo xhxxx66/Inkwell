@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LazyLoad from 'react-lazy-load';
 import { useUserStore } from '@/store/user';
 import { fetchReadingRecords, deleteReadingRecord, clearAllReadingRecords, type ReadingRecord } from '@/api/reading-records';
 import Header from '@/components/Header';
@@ -39,8 +40,8 @@ const ReadingHistory = () => {
         }
         setHasMore(pageNum < (data.data?.totalPages || 1));
       }
-    } catch (error) {
-      console.error('加载阅读历史失败:', error);
+    } catch {
+      // 静默处理
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -71,8 +72,8 @@ const ReadingHistory = () => {
           return newSet;
         });
       }
-    } catch (error) {
-      console.error('删除失败:', error);
+    } catch {
+      // 静默处理
     }
   };
 
@@ -95,8 +96,8 @@ const ReadingHistory = () => {
         setRecords([]);
         setEditMode(false);
       }
-    } catch (error) {
-      console.error('清空失败:', error);
+    } catch {
+      // 静默处理
     }
   };
 
@@ -258,11 +259,14 @@ const ReadingHistory = () => {
             {/* 封面 */}
             <div className="w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
               {record.cover ? (
-                <img
-                  src={record.cover}
-                  alt={record.bookTitle}
-                  className="w-full h-full object-cover"
-                />
+                <LazyLoad className="w-full h-full">
+                  <img
+                    src={record.cover}
+                    alt={record.bookTitle}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </LazyLoad>
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400" />
               )}

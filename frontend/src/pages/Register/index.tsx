@@ -69,7 +69,6 @@ const Register = () => {
       await login({ username: username.trim(), password });
       navigate('/', { replace: true });
     } catch (err: any) {
-      console.error('注册失败:', err);
       setError(err.response?.data?.message || '注册失败，请稍后重试');
     } finally {
       setLoading(false);

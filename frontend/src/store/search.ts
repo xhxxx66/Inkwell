@@ -39,14 +39,12 @@ export const useSearchStore = create<SearchState>()(
         set({ loading: true })
 
         try {
-          // URL 编码处理中文
-          const res: any = await doSearch(encodeURIComponent(keyword))
+          const res: any = await doSearch(keyword.trim())
           const data: SearchResultItem[] = res.data || []
           
           set({ results: data })
           get().addHistory(keyword.trim())
-        } catch (err) {
-          console.error('搜索失败:', err)
+        } catch {
           set({ results: [] })
         } finally {
           set({ loading: false })

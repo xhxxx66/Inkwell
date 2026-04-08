@@ -43,7 +43,6 @@ const Login = () => {
       await login({ username, password });
       navigate('/', { replace: true });
     } catch (err: any) {
-      console.error('登录失败:', err);
       setError(err.response?.data?.message || '登录失败，请检查用户名和密码');
     } finally {
       setLoading(false);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, X, Search as SearchIcon } from 'lucide-react'
+import LazyLoad from 'react-lazy-load'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useSearchStore } from '@/store/search'
 import { Button } from '@/components/ui/button'
@@ -143,11 +144,14 @@ const Search = () => {
                     onClick={() => goToBook(book.id)}
                   >
                     {/* 封面 */}
-                    <img
-                      src={book.cover}
-                      alt={book.title}
-                      className="w-12 h-16 object-cover rounded"
-                    />
+                    <LazyLoad className="w-12 h-16">
+                      <img
+                        src={book.cover}
+                        alt={book.title}
+                        loading="lazy"
+                        className="w-12 h-16 object-cover rounded"
+                      />
+                    </LazyLoad>
                     
                     {/* 信息 */}
                     <div className="flex-1 min-w-0">

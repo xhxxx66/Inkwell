@@ -94,8 +94,8 @@ const BookDetail = () => {
         // 标记书架需要刷新
         resetBookshelf()
       }
-    } catch (error) {
-      console.error('操作失败:', error)
+    } catch {
+      // 静默处理
     } finally {
       setBookmarkLoading(false)
     }
@@ -127,7 +127,7 @@ const BookDetail = () => {
         <div className="flex gap-4">
           {/* 封面 */}
           <div className="w-28 h-36 rounded-lg overflow-hidden shadow-md flex-shrink-0">
-            <img src={book.cover} alt={book.title} className="w-full h-full object-cover" />
+            <img src={book.cover} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
           </div>
 
           {/* 基本信息 */}

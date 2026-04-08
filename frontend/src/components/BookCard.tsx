@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import LazyLoad from 'react-lazy-load'
 
 interface BookCardProps {
   id: number
@@ -20,7 +21,9 @@ const BookCard = ({ id, title, author, cover, description, category }: BookCardP
       {/* 封面 */}
       <div className="w-full aspect-[3/4] bg-gray-200 overflow-hidden">
         {cover ? (
-          <img src={cover} alt={title} className="w-full h-full object-cover" />
+          <LazyLoad className="w-full h-full">
+            <img src={cover} alt={title} loading="lazy" className="w-full h-full object-cover" />
+          </LazyLoad>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
             <span className="text-gray-500 text-sm">暂无封面</span>

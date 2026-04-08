@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LazyLoad from 'react-lazy-load';
 import { useBookshelfStore, type BookshelfItem } from '@/store/bookshelf';
 import { useUserStore } from '@/store/user';
 import Loading from '@/components/Loading';
@@ -263,11 +264,14 @@ const BookshelfCard = ({
       {/* 封面 */}
       <div className="w-full aspect-[3/4] bg-gray-200 overflow-hidden relative">
         {book.cover ? (
-          <img
-            src={book.cover}
-            alt={book.title}
-            className="w-full h-full object-cover"
-          />
+          <LazyLoad className="w-full h-full">
+            <img
+              src={book.cover}
+              alt={book.title}
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
+          </LazyLoad>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
             <span className="text-gray-500 text-xs">暂无封面</span>

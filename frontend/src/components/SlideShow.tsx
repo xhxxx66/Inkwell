@@ -3,6 +3,7 @@ import {
   useEffect,
   useMemo,
 } from 'react'
+import LazyLoad from 'react-lazy-load'
 import Autoplay from 'embla-carousel-autoplay'
 import {
   Carousel,
@@ -64,11 +65,14 @@ const SlideShow: React.FC<SlideShowProps> = ({
           {slides.map(({ id, image, title }, index) => (
             <CarouselItem key={id}>
               <div className='relative aspect-[2/1] w-full'>
-                <img
-                  src={image}
-                  alt={title || `slide ${index + 1}`}
-                  className='h-full w-full object-cover'
-                />
+                <LazyLoad className="w-full h-full">
+                  <img
+                    src={image}
+                    alt={title || `slide ${index + 1}`}
+                    loading="lazy"
+                    className='h-full w-full object-cover'
+                  />
+                </LazyLoad>
                 {title && (
                   <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 text-white'>
                     <h3 className='text-lg font-bold'>{title}</h3>

@@ -16,8 +16,7 @@ const CategoryTabs = ({ activeCategory, onCategoryChange }: CategoryTabsProps) =
           setCategories(data.data || [])
         }
       })
-      .catch((err) => {
-        console.error('获取分类失败:', err)
+      .catch(() => {
         // 降级使用默认分类
         setCategories(['全部', '玄幻', '仙侠', '都市', '言情', '科幻', '历史', '游戏', '悬疑'])
       })

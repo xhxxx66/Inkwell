@@ -53,8 +53,8 @@ const Reader = () => {
     try {
       await upsertReadingRecord(chapter.book.id, chapter.id, progress)
       lastSavedProgressRef.current = progress
-    } catch (error) {
-      console.error('保存阅读进度失败:', error)
+    } catch {
+      // 静默处理
     }
   }, [isLogin, chapter])
 

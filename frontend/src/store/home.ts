@@ -58,8 +58,8 @@ export const useHomeStore = create<HomeState>((set, get) => ({
           initialized: true
         })
       }
-    } catch (error) {
-      console.error('获取书籍列表失败:', error)
+    } catch {
+      // 静默处理
     } finally {
       set({ loading: false })
     }
@@ -91,8 +91,8 @@ export const useHomeStore = create<HomeState>((set, get) => ({
           hasMore: allBooks.length < total
         })
       }
-    } catch (error) {
-      console.error('加载更多失败:', error)
+    } catch {
+      // 静默处理
     } finally {
       set({ loadingMore: false })
     }
@@ -126,8 +126,8 @@ export const useHomeStore = create<HomeState>((set, get) => ({
           initialized: true
         })
       }
-    } catch (error) {
-      console.error('获取书籍列表失败:', error)
+    } catch {
+      // 静默处理
     } finally {
       set({ loading: false })
     }

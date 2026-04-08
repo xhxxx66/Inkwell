@@ -49,6 +49,7 @@ const Profile = () => {
                 <img
                   src={user.avatar}
                   alt={user.nickname || user.username}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               ) : (
