@@ -1,0 +1,1 @@
+import{i as s}from"./react-DT1qeg-z.js";const r=async(t=1,e=10,a)=>s.get("/books",{params:{page:t,limit:e,category:a}}),c=async t=>s.get(`/books/${t}`),n=async()=>s.get("/categories"),h=async(t,e=1,a=50)=>s.get(`/books/${t}/chapters`,{params:{page:e,limit:a}}),p=async t=>s.get(`/chapters/${t}`);export{r as a,c as b,h as c,p as d,n as f};
