@@ -84,17 +84,21 @@ export class SemanticSearchService implements OnModuleInit {
     const queryEmbedding = await this.embeddings.embedQuery(query);
 
     const results = this.vectorData.books
-      .map(book => ({
+      .map((book) => ({
         ...book,
         similarity: cosineSimilarity(queryEmbedding, book.embedding),
       }))
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, limit)
-      .filter(book => book.similarity > 0.3)
-      .map(({ embedding, similarity, ...book }) => ({
-        ...book,
-        score: Math.round(similarity * 100) / 100,
-      }));
+      .filter((book) => book.similarity > 0.3)
+      .map((item) => {
+        const { similarity, ...book } = item;
+        delete (book as any).embedding;
+        return {
+          ...book,
+          score: Math.round(similarity * 100) / 100,
+        };
+      });
 
     return results;
   }

@@ -5,7 +5,7 @@ import { useUserStore } from '@/store/user';
 import { fetchReadingRecords, deleteReadingRecord, clearAllReadingRecords, type ReadingRecord } from '@/api/reading-records';
 import Header from '@/components/Header';
 import Loading from '@/components/Loading';
-import { Clock, Trash2, BookOpen, AlertCircle } from 'lucide-react';
+import { Clock, Trash2, BookOpen } from 'lucide-react';
 
 const ReadingHistory = () => {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const ReadingHistory = () => {
 
   useEffect(() => {
     loadRecords(1);
-  }, [isLogin]);
+  }, [isLogin, loadRecords]);
 
   // 加载更多
   const handleLoadMore = () => {
@@ -58,23 +58,6 @@ const ReadingHistory = () => {
     const nextPage = page + 1;
     setPage(nextPage);
     loadRecords(nextPage, true);
-  };
-
-  // 删除单条记录
-  const handleDelete = async (bookId: number) => {
-    try {
-      const data: any = await deleteReadingRecord(bookId);
-      if (data.code === 200) {
-        setRecords(prev => prev.filter(r => r.bookId !== bookId));
-        setSelectedIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(bookId);
-          return newSet;
-        });
-      }
-    } catch {
-      // 静默处理
-    }
   };
 
   // 批量删除

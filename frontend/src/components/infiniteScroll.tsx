@@ -23,7 +23,10 @@ const  InfiniteScroll:React.FC<InfiniteScrollProps>=({
     const sentinelRef = useRef<HTMLDivElement>(null);
     // 使用 ref 保存最新的状态，避免 useEffect 依赖变化导致重复触发
     const stateRef = useRef({ hasMore, isLoading, onLoadMore });
-    stateRef.current = { hasMore, isLoading, onLoadMore };
+    
+    useEffect(() => {
+        stateRef.current = { hasMore, isLoading, onLoadMore };
+    }, [hasMore, isLoading, onLoadMore]);
 
     useEffect(()=>{
         const sentinel = sentinelRef.current;

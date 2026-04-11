@@ -13,10 +13,10 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    USE_MOCK && viteMockServe({
+    ...(USE_MOCK ? [viteMockServe({
       mockPath: 'mock'
-    })
-  ].filter(Boolean),
+    })] : [])
+  ],
   resolve: {
     alias: {
       // __dirname node 的超级变量 项目根目录

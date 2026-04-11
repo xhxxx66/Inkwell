@@ -12,7 +12,6 @@ const Bookshelf = () => {
   const { isLogin } = useUserStore();
   const {
     books,
-    readingRecords,
     loading,
     initialized,
     operatingBookIds,

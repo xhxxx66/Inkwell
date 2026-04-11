@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Param,
-  ParseIntPipe
-} from '@nestjs/common';
+import { Controller, Get, Query, Param, ParseIntPipe } from '@nestjs/common';
 import { ChaptersService } from './chapters.service';
 import { ChapterQueryDto } from './dto/chapter-query.dto';
 
@@ -16,7 +10,7 @@ export class ChaptersController {
   @Get('books/:bookId/chapters')
   async getChaptersByBook(
     @Param('bookId', ParseIntPipe) bookId: number,
-    @Query() query: ChapterQueryDto
+    @Query() query: ChapterQueryDto,
   ) {
     return this.chaptersService.findByBookId(bookId, query);
   }

@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import type { Message } from './dto/chat.dto';
 import { ChatDeepSeek } from '@langchain/deepseek';
-import { SystemMessage, HumanMessage, AIMessage } from '@langchain/core/messages';
+import {
+  SystemMessage,
+  HumanMessage,
+  AIMessage,
+} from '@langchain/core/messages';
 
 export function convertToLangChainMessages(
   messages: Message[],

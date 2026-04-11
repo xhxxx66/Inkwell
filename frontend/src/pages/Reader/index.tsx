@@ -31,7 +31,7 @@ const Reader = () => {
   
   // 用于记录阅读进度
   const contentRef = useRef<HTMLDivElement>(null)
-  const saveTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastSavedProgressRef = useRef<number>(0)
 
   // 计算阅读进度（基于滚动位置）
@@ -116,11 +116,13 @@ const Reader = () => {
   // 章节加载时记录阅读开始
   useEffect(() => {
     if (!id) return
-    setLoading(true)
-    lastSavedProgressRef.current = 0
     
-    fetchChapterById(Number(id))
-      .then((data: any) => {
+    const loadData = async () => {
+      setLoading(true)
+      lastSavedProgressRef.current = 0
+      
+      try {
+        const data: any = await fetchChapterById(Number(id))
         if (data.code === 200) {
           setChapter(data.data)
           // 章节加载成功后，记录阅读进度为0（表示开始阅读）
@@ -128,8 +130,12 @@ const Reader = () => {
             upsertReadingRecord(data.data.book.id, data.data.id, 0).catch(() => {})
           }
         }
-      })
-      .finally(() => setLoading(false))
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadData()
   }, [id, isLogin])
 
   // 返回书籍详情页（用 replace 避免历史记录累积）

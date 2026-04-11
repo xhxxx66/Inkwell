@@ -1,9 +1,4 @@
-import {
-  IsOptional,
-  IsInt,
-  IsString,
-  Min
-} from 'class-validator';
+import { IsOptional, IsInt, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class BookQueryDto {

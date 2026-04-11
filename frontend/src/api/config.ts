@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-// 切换 mock / 真实后端：改 USE_MOCK 即可
-const USE_MOCK = false;
-const BASE_URL = USE_MOCK ? '/api' : 'http://localhost:3000/api';
+// 从环境变量读取配置
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+const BASE_URL = USE_MOCK 
+  ? '/api' 
+  : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api');
 
 const instance = axios.create({
   baseURL: BASE_URL
@@ -16,7 +18,7 @@ const getToken = () => {
       const parsed = JSON.parse(stored);
       return parsed.state?.accessToken || null;
     }
-  } catch (e) {
+  } catch {
     return null;
   }
   return null;
@@ -30,7 +32,7 @@ const getRefreshToken = () => {
       const parsed = JSON.parse(stored);
       return parsed.state?.refreshToken || null;
     }
-  } catch (e) {
+  } catch {
     return null;
   }
   return null;

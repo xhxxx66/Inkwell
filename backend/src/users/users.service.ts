@@ -15,7 +15,7 @@ export class UsersService {
 
     // 检查用户名是否已存在
     const existingUser = await this.prisma.user.findUnique({
-      where: { username }
+      where: { username },
     });
 
     if (existingUser) {
@@ -38,13 +38,13 @@ export class UsersService {
         nickname: true,
         avatar: true,
         createdAt: true,
-      }
+      },
     });
 
     return {
       code: 200,
       msg: '注册成功',
-      data: user
+      data: user,
     };
   }
 
@@ -64,21 +64,21 @@ export class UsersService {
         gender: true,
         bio: true,
         createdAt: true,
-      }
+      },
     });
 
     if (!user) {
       return {
         code: 404,
         msg: '用户不存在',
-        data: null
+        data: null,
       };
     }
 
     return {
       code: 200,
       msg: 'success',
-      data: user
+      data: user,
     };
   }
 }

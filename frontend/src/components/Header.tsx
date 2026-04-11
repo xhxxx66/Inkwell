@@ -5,16 +5,18 @@ interface HeaderProps {
   showBackBtn?: boolean
   onBackClick?: () => void
   rightSlot?: React.ReactNode
+  className?: string
 }
 
 const Header: React.FC<HeaderProps> = ({
   title,
   showBackBtn = false,
   onBackClick = () => window.history.back(),
-  rightSlot
+  rightSlot,
+  className = ''
 }) => {
   return (
-    <header className="flex items-center justify-center h-12 px-4 border-b border-gray-100 bg-white sticky top-0 z-40">
+    <header className={`flex items-center justify-center h-12 px-4 border-b border-gray-100 bg-white sticky top-0 z-40 ${className}`}>
       {/* 左侧 */}
       <div className="absolute left-4">
         {showBackBtn && (

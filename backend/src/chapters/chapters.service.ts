@@ -24,9 +24,9 @@ export class ChaptersService {
           orderNum: true,
           wordCount: true,
           isVip: true,
-          createdAt: true
-        }
-      })
+          createdAt: true,
+        },
+      }),
     ]);
 
     return {
@@ -37,8 +37,8 @@ export class ChaptersService {
         current: page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -50,17 +50,17 @@ export class ChaptersService {
         book: {
           select: {
             id: true,
-            title: true
-          }
-        }
-      }
+            title: true,
+          },
+        },
+      },
     });
 
     if (!chapter) {
       return {
         code: 404,
         msg: 'Chapter not found',
-        data: null
+        data: null,
       };
     }
 
@@ -69,19 +69,19 @@ export class ChaptersService {
       this.prisma.chapter.findFirst({
         where: {
           bookId: chapter.bookId,
-          orderNum: { lt: chapter.orderNum }
+          orderNum: { lt: chapter.orderNum },
         },
         orderBy: { orderNum: 'desc' },
-        select: { id: true, title: true }
+        select: { id: true, title: true },
       }),
       this.prisma.chapter.findFirst({
         where: {
           bookId: chapter.bookId,
-          orderNum: { gt: chapter.orderNum }
+          orderNum: { gt: chapter.orderNum },
         },
         orderBy: { orderNum: 'asc' },
-        select: { id: true, title: true }
-      })
+        select: { id: true, title: true },
+      }),
     ]);
 
     return {
@@ -96,8 +96,8 @@ export class ChaptersService {
         isVip: chapter.isVip,
         book: chapter.book,
         prevChapter,
-        nextChapter
-      }
+        nextChapter,
+      },
     };
   }
 }

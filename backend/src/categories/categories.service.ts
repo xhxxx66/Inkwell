@@ -7,13 +7,13 @@ export class CategoriesService {
 
   async findAll() {
     const categories = await this.prisma.category.findMany({
-      orderBy: { orderNum: 'asc' }
+      orderBy: { orderNum: 'asc' },
     });
 
     return {
       code: 200,
       msg: 'success',
-      data: ['全部', ...categories.map(c => c.name)]
+      data: ['全部', ...categories.map((c) => c.name)],
     };
   }
 }

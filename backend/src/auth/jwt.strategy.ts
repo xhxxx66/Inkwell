@@ -10,7 +10,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       // 从 Authorization header 提取 Bearer token
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('TOKEN_SECRET') || 'inkwell-jwt-secret'
+      secretOrKey:
+        configService.get<string>('TOKEN_SECRET') || 'inkwell-jwt-secret',
     });
   }
 
@@ -18,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     return {
       id: payload.sub,
-      username: payload.username
+      username: payload.username,
     };
   }
 }

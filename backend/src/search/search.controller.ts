@@ -34,7 +34,10 @@ export class SearchController {
         );
 
         if (results.length === 0) {
-          const fallback = await this.booksService.search(decodedKeyword, parsedLimit);
+          const fallback = await this.booksService.search(
+            decodedKeyword,
+            parsedLimit,
+          );
           return fallback;
         }
 

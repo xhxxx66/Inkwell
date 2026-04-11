@@ -19,7 +19,7 @@ export class AuthService {
 
     // 查询用户
     const user = await this.prisma.user.findUnique({
-      where: { username }
+      where: { username },
     });
 
     // 验证用户和密码
@@ -37,7 +37,7 @@ export class AuthService {
         username: user.username,
         nickname: user.nickname,
         avatar: user.avatar,
-      }
+      },
     };
   }
 
@@ -48,13 +48,13 @@ export class AuthService {
     try {
       // 验证 refresh_token
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: process.env.TOKEN_SECRET
+        secret: process.env.TOKEN_SECRET,
       });
 
       if (payload) {
         return this.generateTokens(payload.sub, payload.username);
       }
-    } catch (e) {
+    } catch {
       throw new UnauthorizedException('Refresh token 已失效，请重新登录');
     }
   }
@@ -65,20 +65,20 @@ export class AuthService {
   private async generateTokens(id: string, username: string) {
     const payload = {
       sub: id,
-      username
+      username,
     };
 
     const [accessToken, refreshToken] = await Promise.all([
       // access_token: 15分钟有效期
       this.jwtService.signAsync(payload, {
         expiresIn: '15m',
-        secret: process.env.TOKEN_SECRET
+        secret: process.env.TOKEN_SECRET,
       }),
       // refresh_token: 7天有效期
       this.jwtService.signAsync(payload, {
         expiresIn: '7d',
-        secret: process.env.TOKEN_SECRET
-      })
+        secret: process.env.TOKEN_SECRET,
+      }),
     ]);
 
     return {

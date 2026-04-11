@@ -14,7 +14,7 @@ export class BooksService {
     const where: any = {};
     if (category && category !== '全部') {
       where.category = {
-        name: category
+        name: category,
       };
     }
 
@@ -27,28 +27,28 @@ export class BooksService {
         orderBy: { id: 'desc' },
         include: {
           category: {
-            select: { name: true }
+            select: { name: true },
           },
           tags: {
             select: {
               tag: {
-                select: { name: true }
-              }
-            }
-          }
-        }
-      })
+                select: { name: true },
+              },
+            },
+          },
+        },
+      }),
     ]);
 
     // 整理返回数据
-    const items = books.map(book => ({
+    const items = books.map((book) => ({
       id: book.id,
       title: book.title,
       author: book.author,
       cover: book.cover,
       description: book.description,
       category: book.category?.name || '',
-      tags: book.tags.map(t => t.tag.name),
+      tags: book.tags.map((t) => t.tag.name),
       wordCount: book.wordCount,
       chapterCount: book.chapterCount,
       status: book.status,
@@ -57,7 +57,7 @@ export class BooksService {
       likeCount: book.likeCount,
       collectCount: book.collectCount,
       commentCount: book.commentCount,
-      publishedAt: book.publishedAt
+      publishedAt: book.publishedAt,
     }));
 
     return {
@@ -68,8 +68,8 @@ export class BooksService {
         current: page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -81,7 +81,7 @@ export class BooksService {
       return {
         code: 200,
         msg: 'success',
-        data: []
+        data: [],
       };
     }
 
@@ -89,32 +89,32 @@ export class BooksService {
       where: {
         OR: [
           { title: { contains: keyword, mode: 'insensitive' } },
-          { author: { contains: keyword, mode: 'insensitive' } }
-        ]
+          { author: { contains: keyword, mode: 'insensitive' } },
+        ],
       },
       take: limit,
       orderBy: { readCount: 'desc' },
       include: {
         category: {
-          select: { name: true }
-        }
-      }
+          select: { name: true },
+        },
+      },
     });
 
-    const items = books.map(book => ({
+    const items = books.map((book) => ({
       id: book.id,
       title: book.title,
       author: book.author,
       cover: book.cover,
       category: book.category?.name || '',
       wordCount: book.wordCount,
-      status: book.status
+      status: book.status,
     }));
 
     return {
       code: 200,
       msg: 'success',
-      data: items
+      data: items,
     };
   }
 
@@ -123,30 +123,30 @@ export class BooksService {
       where: { id },
       include: {
         category: {
-          select: { name: true }
+          select: { name: true },
         },
         tags: {
           select: {
             tag: {
-              select: { name: true }
-            }
-          }
+              select: { name: true },
+            },
+          },
         },
         authorUser: {
           select: {
             id: true,
             nickname: true,
-            avatar: true
-          }
-        }
-      }
+            avatar: true,
+          },
+        },
+      },
     });
 
     if (!book) {
       return {
         code: 404,
         msg: 'Book not found',
-        data: null
+        data: null,
       };
     }
 
@@ -160,7 +160,7 @@ export class BooksService {
         cover: book.cover,
         description: book.description,
         category: book.category?.name || '',
-        tags: book.tags.map(t => t.tag.name),
+        tags: book.tags.map((t) => t.tag.name),
         wordCount: book.wordCount,
         chapterCount: book.chapterCount,
         status: book.status,
@@ -170,8 +170,8 @@ export class BooksService {
         collectCount: book.collectCount,
         commentCount: book.commentCount,
         publishedAt: book.publishedAt,
-        authorUser: book.authorUser
-      }
+        authorUser: book.authorUser,
+      },
     };
   }
 }

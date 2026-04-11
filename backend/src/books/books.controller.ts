@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Param,
-  ParseIntPipe
-} from '@nestjs/common';
+import { Controller, Get, Query, Param, ParseIntPipe } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { BookQueryDto } from './dto/book-query.dto';
 

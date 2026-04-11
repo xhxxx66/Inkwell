@@ -8,11 +8,11 @@ import { JwtAuthGuard } from './guard/jwt-auth.guard';
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.TOKEN_SECRET
-    })
+      secret: process.env.TOKEN_SECRET,
+    }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  exports: [JwtAuthGuard]
+  exports: [JwtAuthGuard],
 })
 export class AuthModule {}

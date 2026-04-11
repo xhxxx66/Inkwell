@@ -10,7 +10,7 @@ interface BackToTopProps {
 }
 
 const BackToTop = ({ threshold = 400, throttleDelay = 150 }: BackToTopProps) => {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(() => window.scrollY > threshold)
 
   // 滚动到顶部
   const scrollToTop = () => {
@@ -28,9 +28,6 @@ const BackToTop = ({ threshold = 400, throttleDelay = 150 }: BackToTopProps) => 
   }, [threshold, throttleDelay])
 
   useEffect(() => {
-    // 初始检查
-    setIsVisible(window.scrollY > threshold)
-    
     window.addEventListener('scroll', throttledScroll, { passive: true })
     
     return () => {
